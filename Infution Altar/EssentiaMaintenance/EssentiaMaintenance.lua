@@ -25,7 +25,7 @@ local function getEssCraftable()
 	return list
 end
 
-local function changeErr(typeStr,nameStr,status)
+local function changInfo(typeStr,nameStr,status)
 	if infoList[typeStr][nameStr] ~= status then
 		infoChange = true
 		infoList[typeStr][nameStr] = status
@@ -37,14 +37,14 @@ local function getUsableCPU()
 	for n = 1, #allCPU do
 		if allCPU[n].name:match("^"..TagName) == TagName then
 			hasNamedCPU = true
-			changeErr("未命名","cpu",0)
+			changInfo("未命名","cpu",0)
 			if allCPU[n].busy == false then
 				return allCPU[n]
 			end
 		end
 	end
 	if not hasNamedCPU then
-		changeErr("未命名","cpu",true)
+		changInfo("未命名","cpu",true)
 	end
 end
 
@@ -62,20 +62,20 @@ local function requestEss(name,NUM)
 		gpu.set(1,1," • 正在请求源质[ "..tostring(name).." ]      ")
 	end
 	if listRequest[name] then
-		changeErr("无样板",name,nil)
+		changInfo("无样板",name,nil)
 		local cpu = getUsableCPU()
 		if cpu then
 			craftingList[name] = listRequest[name](NUM,nil,cpu.name)
 			if craftingList[name].hasFailed() then
-				changeErr("无原料",name,1)
+				changInfo("无原料",name,1)
 				craftingList[name] = nil
 			else
-				changeErr("无原料",name,nil)
+				changInfo("无原料",name,nil)
 				return nil
 			end
 		end
 	else
-		changeErr("无样板",name,1)
+		changInfo("无样板",name,1)
 	end
 end
 
@@ -141,7 +141,7 @@ local function main()
 					requestEss(v.label:match("^%S+"):lower(),Num_perRequest)
 				end
 			end
-			changeErr("massage","content",massage)
+			changInfo("massage","content",massage)
 			modem.broadcast(port,massage)
 			DisplayInformation()
 		until massage == true
