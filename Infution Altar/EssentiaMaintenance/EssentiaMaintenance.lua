@@ -2,7 +2,6 @@ local component = require("component")
 local floor = require("math").floor
 local sides = require("sides")
 local gpu = component.gpu
-local rs = component.redstone
 local controller = component.me_controller
 
 -- 可供配置的部分
@@ -128,6 +127,12 @@ local function DisplayInformation()
 	infoChange= false
 end
 
+local function hasRSIO()
+	for _,_ in pairs(component.list("redstone")) do
+		return true
+	end
+end 
+
 local function main()
 	listRequest = getEssCraftable()
 	os.execute("cls")
@@ -148,10 +153,12 @@ local function main()
 				end
 			end
 			changInfo("ableToInfution","content",ableToInfution)
-			if ableToInfution then
-				rs.setOutput(signalOutput,16)
-			else
-				rs.setOutput(signalOutput,0)
+			if hasRSIO() then
+				if ableToInfution then
+					component.redstone.setOutput(signalOutput,16)
+				else
+					component.redstone.setOutput(signalOutput,0)
+				end
 			end
 			DisplayInformation()
 		until ableToInfution == true
