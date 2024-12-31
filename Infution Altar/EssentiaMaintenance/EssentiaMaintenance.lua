@@ -10,6 +10,10 @@ local minReserve = 2048	-- 所有源质的最低储量
 local Num_perRequest = 2048 -- 每次请求的数量
 local signalOutput = sides.top -- 源质不足时红石信号在红石IO端口输出的方向
 local TagName = "InfusionCPU"	-- 设置被用于源质下单的CPU的名称
+-- 设置特定源质的缓存量
+local IndividualEssReserve = {
+	...
+}
 
 local infoList = {["无样板"]={},["未命名"]={},["无原料"]={},["ableToInfution"]={}}
 local length,height = gpu.getViewport()
@@ -134,8 +138,13 @@ local function main()
 			local currentEss = controller.getEssentiaInNetwork()
 			requestMissingEss(currentEss)
 			for _, v in pairs(currentEss) do
-				if v.amount < minReserve then
-					requestEss(v.label:match("^%S+"):lower(),Num_perRequest)
+				local name = v.label:match("^%S+"):lower()
+				local finalMinReserve = IndividualEssReserve[name]
+				if not finalMinReserve then
+					finalMinReserve = minReserve
+				end
+				if v.amount < finalMinReserve then
+					requestEss(name,Num_perRequest)
 				end
 			end
 			changInfo("ableToInfution","content",ableToInfution)
