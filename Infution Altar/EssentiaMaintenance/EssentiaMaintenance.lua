@@ -1,16 +1,17 @@
-local port = 12306	-- 端口(需与注魔自动化端口相同)
-local signalStrength = 256 -- 信号强度(最大为400)
-local minReserve = 2048	-- 所有源质的最低储量
-local Num_perRequest = 2048 -- 每次请求的数量
-local TagName = "InfusionCPU"	-- 设置被用于源质下单的CPU的名称
-
 local component = require("component")
 local floor = require("math").floor
+local sides = require("sides")
 local gpu = component.gpu
-local modem = component.modem
+local rs = component.redstone
 local controller = component.me_controller
 
-local infoList = {["无样板"]={},["未命名"]={},["无原料"]={},["massage"]={}}
+-- 可供配置的部分
+local minReserve = 2048	-- 所有源质的最低储量
+local Num_perRequest = 2048 -- 每次请求的数量
+local signalOutput = sides.top -- 源质不足时红石信号在红石IO端口输出的方向
+local TagName = "InfusionCPU"	-- 设置被用于源质下单的CPU的名称
+
+local infoList = {["无样板"]={},["未命名"]={},["无原料"]={},["ableToInfution"]={}}
 local length,height = gpu.getViewport()
 local maxRows = floor((height - 6)/2)
 local maxLens = length - 2
@@ -49,7 +50,7 @@ local function getUsableCPU()
 end
 
 local function requestEss(name,NUM)
-	massage = false
+	ableToInfution = false
 	::RE::
 	for k, v in pairs(craftingList) do
 		if v.isDone() or v.isCanceled() then
@@ -117,23 +118,19 @@ local function DisplayInformation()
 		showInfoInBounds(1,6,maxLens,maxRows,infoList["无样板"])
 		gpu.set(1,6 + maxRows,"---以下源质缺少原料---")
 		showInfoInBounds(1,7 + maxRows,maxLens,maxRows,infoList["无原料"])
-		gpu.set(length - 10,height - 3,"已发送报文")
-		gpu.set(length - 8,height - 1,tostring(massage))
+		gpu.set(length - 12,height - 3,"源质是否充足")
+		gpu.set(length - 8,height - 1,tostring(ableToInfution))
 	end
 	infoChange= false
 end
 
 local function main()
-	-- 初始化
 	listRequest = getEssCraftable()
-	modem.setStrength(signalStrength)
-	modem.open(port)
-
 	os.execute("cls")
 	while true do
 		os.sleep(1)
 		repeat
-			massage = true
+			ableToInfution = true
 			local currentEss = controller.getEssentiaInNetwork()
 			requestMissingEss(currentEss)
 			for _, v in pairs(currentEss) do
@@ -141,10 +138,14 @@ local function main()
 					requestEss(v.label:match("^%S+"):lower(),Num_perRequest)
 				end
 			end
-			changInfo("massage","content",massage)
-			modem.broadcast(port,massage)
+			changInfo("ableToInfution","content",ableToInfution)
+			if ableToInfution then
+				rs.setOutput(signalOutput,16)
+			else
+				rs.setOutput(signalOutput,0)
+			end
 			DisplayInformation()
-		until massage == true
+		until ableToInfution == true
 	end
 end
 
