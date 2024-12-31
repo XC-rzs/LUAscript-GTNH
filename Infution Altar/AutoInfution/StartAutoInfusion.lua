@@ -1,10 +1,8 @@
 io = require("io")
 sides = require("sides")
-event = require("event")
 component = require("component")
 local rs = component.redstone
 local data = component.database
-local modem = component.modem
 local interface = component.me_interface
 
 -- 获取组件代理(需要更改)
@@ -15,25 +13,24 @@ local ts_ap = component.proxy("eee8e7f8-07fe-4a0a-ac43-404f9ad432eb")	-- 注魔�
 local directions = {
 	RM = sides.east, --符文矩阵方向
 	WA = sides.south, --控制世界加速器的红石导管方向
+	sideControl = sides.down --输入红石信号控制注魔的面
 }
 
 local config = {
 	-- 设置注魔最大时间，括号内为时间，单位为s(超出最大时间会报错)
-	InfusionMaxTime = (5)*20,
+	InfusionMaxTime = (5)*72,
 	-- 等待原料连续输入的时间(单位为s)
 	waitForInputSleepTime = 0.02,
-	-- 端口(需与缓存指令器端口相同)
-	port = 12306,
-	-- 是否启用源质充足判断
-	EnableEssentiaJudgment = true
+	-- 是否反相控制信号(默认为有信号启动注魔)
+	invertSignal = false
 }
 
 local function getAddress(str)
-	local list_address = {}
-	for key,value in pairs(component.list(str)) do
-		table.insert(list_address,key)
+	local list = {}
+	for k,_ in pairs(component.list(str)) do
+		table.insert(list,k)
 	end
-	return list_address
+	return list
 end
 
 local function setWAstatus(num)
@@ -47,19 +44,19 @@ local function sendPulse()
     rs.setOutput(directions.RM, 0)
 end
 
-local function printAndClear(str,t) 
+local function printAndClear(str,t)
 	print(str) os.sleep(t) os.execute("cls")
 end
 
 local function isWandsAspectsEnough()
 	while not ts_ap.getStackInSlot(sides.down,1) do
-		printAndClear("ERROR: 法杖缺失，请在注魔爪内放置法杖",3)
+		printAndClear("ERR: 法杖缺失，请在注魔爪内放置法杖",3)
 	end
 	::RESTART::
 	local ap = ts_ap.getStackInSlot(sides.down,1)
-	for i=1,6 do
+	for i=1, 6 do
 		if ap.aspects[i].amount < 1000 then
-			printAndClear("ERROR: 法杖内要素不足，请检查魔力中继器是否正常工作",3) 
+			printAndClear("ERR: 法杖内要素不足，请检查魔力中继器是否正常工作",3) 
 			goto RESTART
 		end
 	end
@@ -72,21 +69,20 @@ local function ExportResidual(list)
 	if #list > 9 then
 		num = 9
 		nextNum = #list - 9
-	else 
-		num,nextNum = #list,1 
+	else
+		num,nextNum = #list,1
 	end
-	for i=1,num do
+	for i=1, num do
 		data.set(i,list[i].name,list[i].damage)
 	end
 	if nextNum == 1 then ts.transferItem(sides.top,directions.RM) end
-	for i=1,num do
+	for i=1, num do
 		interface.setInterfaceConfiguration(i,address_database,i,list[i].maxSize)
 	end
 	while next(interface.getItemsInNetwork(),nextNum) do end
-	if nextNum == 1 then 
-		data.clear(1)
-		for i=1,MarkedSlotsNum do
-			interface.setInterfaceConfiguration(i,address_database,1)
+	if nextNum == 1 then
+		for i=1, MarkedSlotsNum do
+			interface.setInterfaceConfiguration(i)
 		end
 		ts.transferItem(directions.RM,sides.top)
 	else
@@ -96,11 +92,11 @@ local function ExportResidual(list)
 	end
 end
 
-local function reportErrAndWait()
+local function reportErrAndWait(currentStack)
 	hasError = true
 	setWAstatus(0)
 	ts.transferItem(directions.RM,sides.down)
-	print("ERROR：注魔 "..currentStack.label.." (被注魔物)时超时\n可能的原因：1- 输入物品不构成配方；2- 源质不足\n")
+	print("ERR：注魔 "..currentStack.label.." (被注魔物)时超时\n可能的原因：1- 输入物品不构成配方；2- 源质不足\n")
 	print("已将被注魔物抽回主网，等待排障中.....\n")
 	print([[按下 "Enter" 继续注魔]])
 	io.read()
@@ -111,14 +107,13 @@ local function reportErrAndWait()
 end
 
 local function isInfusingFinished(currentStack)
-	local time = 0
+	local startTime = os.time()
 	local cachedlabel = currentStack.label
 	repeat
 		currentStack = ts.getStackInSlot(directions.RM,1)
 		ItemInSubnet = interface.getItemsInNetwork()
-		time = time + 1
-		if time > config.InfusionMaxTime then
-			reportErrAndWait()
+		if os.time() - startTime > config.InfusionMaxTime then
+			reportErrAndWait(currentStack)
 			break
 		end
 	until currentStack.label ~= cachedlabel or #ItemInSubnet == 1
@@ -141,62 +136,50 @@ local function isResidueInSubnet()
 	end
 end
 
-local function isEssentiaEnough()
-	if config.EnableEssentiaJudgment == true then
-		_, _, _, _, _, massage = event.pull(0.1,"modem_message")
-		if massage == nil then
-			lsct = lsct + 1
-			if lsct == 3 then
-				print("可能的错误：未接收到报文！")
-			end
-		else
-			lsct = 0
-			ableToStart = massage
-		end
-		if not ableToStart then
-			setWAstatus(0)
-			print("源质不足，等待合成中....")
-			while not ableToStart do
-				os.sleep(1)
-				_, _, _, _, _, ableToStart = event.pull("modem_message")
-			end
-			os.execute("cls")
-			setWAstatus(1)
-		end
+local function hasSignal()
+	if rs.getInput(directions.sideControl) == 0 then
+		return false else return true
 	end
 end
 
-local function MainProcess()
-	local currentStack = ts.getStackInSlot(directions.RM,1)
-	if currentStack then
-		setWAstatus(1)
-		repeat
-			repeat
-				repeat
-					isEssentiaEnough()
-					isWandsAspectsEnough()
-					currentStack = isInfusingFinished(currentStack)
-					Output(currentStack)
-					currentStack = ts.getStackInSlot(directions.RM,1)
-				until not currentStack
-				os.sleep(config.waitForInputSleepTime)
-				currentStack = ts.getStackInSlot(directions.RM,1)
-			until not currentStack 
-			isResidueInSubnet()
-			currentStack = ts.getStackInSlot(directions.RM,1)
-		until not currentStack
+local function allowInfution()
+	if config.invertSignal == hasSignal() then
 		setWAstatus(0)
+		print("已被外部信号暂停，等待中....")
+		while config.invertSignal == hasSignal() do os.sleep(1) end
+		os.execute("cls")
+		setWAstatus(1)
 	end
 end
 
 local function main()
-	if config.EnableEssentiaJudgment == true then
-		modem.open(config.port)
+	address_database = getAddress("database")[1]
+	while not address_database do
+		printAndClear("ERR:适配器中缺少数据库！",3)
+		address_database = getAddress("database")[1]
 	end
-	address_database,lsct = getAddress("database")[1],0
 	while true do
 		os.sleep(0.5)
-		MainProcess()
+		local currentStack = ts.getStackInSlot(directions.RM,1)
+		if currentStack then
+			setWAstatus(1)
+			repeat
+				repeat
+					repeat
+						allowInfution()
+						isWandsAspectsEnough()
+						currentStack = isInfusingFinished(currentStack)
+						Output(currentStack)
+						currentStack = ts.getStackInSlot(directions.RM,1)
+					until not currentStack
+					os.sleep(config.waitForInputSleepTime)
+					currentStack = ts.getStackInSlot(directions.RM,1)
+				until not currentStack
+				isResidueInSubnet()
+				currentStack = ts.getStackInSlot(directions.RM,1)
+			until not currentStack
+			setWAstatus(0)
+		end
 	end
 end
 
