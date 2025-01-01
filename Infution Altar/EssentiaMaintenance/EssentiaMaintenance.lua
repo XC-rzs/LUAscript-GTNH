@@ -1,5 +1,4 @@
 local component = require("component")
-local floor = require("math").floor
 local sides = require("sides")
 local gpu = component.gpu
 local controller = component.me_controller
@@ -16,7 +15,7 @@ local IndividualEssReserve = {
 
 local infoList = {["无样板"]={},["未命名"]={},["无原料"]={},["ableToInfution"]={}}
 local length,height = gpu.getViewport()
-local maxRows = floor((height - 6)/2)
+local maxRows = math.floor((height - 6)/2)
 local maxLens = length - 2
 local craftingList = {}
 local infoChange = true

@@ -1,4 +1,3 @@
-io = require("io")
 sides = require("sides")
 component = require("component")
 local rs = component.redstone
