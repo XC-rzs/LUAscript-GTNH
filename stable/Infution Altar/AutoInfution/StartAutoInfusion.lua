@@ -3,7 +3,7 @@ local computer = require "computer"
 local component = require "component"
 
 local config = {
-	maxInfusionSecond = 6,
+	maxInfusionSecond = 10,
 	modemPort = 12306
 }
 
@@ -135,6 +135,7 @@ local function setWorldAcceleratorStatus(boolean)
 	for i = 1, #componentProxy.WorldAccelerator do
 		componentProxy.WorldAccelerator[i].setWorkAllowed(boolean)
 	end
+	os.sleep(0.5)
 end
 
 local function init()
@@ -261,6 +262,9 @@ local function ExportReamainingItems(list)
 end
 
 local function processRemainingItemsInSubnet()
+	if getStackInArcanePedestal() then
+		return nil
+	end
 	local ItemInSubnet = interface.getItemsInNetwork()
 	if next(ItemInSubnet) ~= nil then
 		ExportReamainingItems(ItemInSubnet)
