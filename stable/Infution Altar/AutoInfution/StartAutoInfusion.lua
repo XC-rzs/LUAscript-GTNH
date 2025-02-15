@@ -145,6 +145,7 @@ local function init()
 		getWorldAcceleratorProxy()
 	until checkInitSuccess()
 	setWorldAcceleratorStatus(false)
+	print("初始化成功！\n等待注魔中.....")
 end
 
 local function getStackInArcanePedestal()
