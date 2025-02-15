@@ -131,6 +131,12 @@ local function checkInitSuccess()
 	end
 end
 
+local function setWorldAcceleratorStatus(boolean)
+	for i = 1, #componentProxy.WorldAccelerator do
+		componentProxy.WorldAccelerator[i].setWorkAllowed(boolean)
+	end
+end
+
 local function init()
 	registerEventListen()
 	repeat
@@ -138,6 +144,7 @@ local function init()
 		getTransposerProxy()
 		getWorldAcceleratorProxy()
 	until checkInitSuccess()
+	setWorldAcceleratorStatus(false)
 end
 
 local function getStackInArcanePedestal()
@@ -146,12 +153,6 @@ end
 
 local function getStackInInfusionClaw()
 	return componentProxy.transposer.forInfusionClaw.getStackInSlot(directions.InfutionClaw, 1)
-end
-
-local function setWorldAcceleratorStatus(boolean)
-	for i = 1, #componentProxy.WorldAccelerator do
-		componentProxy.WorldAccelerator[i].setWorkAllowed(boolean)
-	end
 end
 
 local function checkWandsAspects()
