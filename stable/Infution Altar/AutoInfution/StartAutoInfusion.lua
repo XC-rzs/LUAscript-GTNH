@@ -55,7 +55,7 @@ local function registerEventListen()
 			enableSignal.fromRedstone = false
 		end
 	end)
-	if component.list("modem") ~= {} then
+	if next(component.list("modem")) ~= nil then
 		component.modem.open(config.modemPort)
 		event.listen("modem_massage", function(eventType, selfAddress, sourceAddress, port, distance, massage)
 			enableSignal.fromModem = massage
