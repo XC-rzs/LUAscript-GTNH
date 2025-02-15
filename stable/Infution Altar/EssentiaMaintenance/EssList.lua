@@ -1,206 +1,206 @@
 -- 平衡
-"aequalitas" = nil
+aequalitas = nil
 
 -- 风
-"aer" = nil
+aer = nil
 
 -- 异域
-"alienis" = nil
+alienis = nil
 
 -- 水
-"aqua" = nil
+aqua = nil
 
 -- 木头
-"arbor" = nil
+arbor = nil
 
 -- 星辰
-"astrum" = nil
+astrum = nil
 
 -- 灵气
-"auram" = nil
+auram = nil
 
 -- 野兽
-"bestia" = nil
+bestia = nil
 
 -- 宙空
-"caelum" = nil
+caelum = nil
 
 -- 思维
-"cognitio" = nil
+cognitio = nil
 
 -- 肉体
-"corpus" = nil
+corpus = nil
 
 -- 怠倦
-"desidia" = nil
+desidia = nil
 
 -- 电力
-"electrum" = nil
+electrum = nil
 
 -- 亡灵
-"exanimis" = nil
+exanimis = nil
 
 -- 合成
-"fabrico" = nil
+fabrico = nil
 
 -- 饥饿
-"fames" = nil
+fames = nil
 
 -- 寒冰
-"gelum" = nil
+gelum = nil
 
 -- 荣耀
-"gloria" = nil
+gloria = nil
 
 -- 饕餮
-"gula" = nil
+gula = nil
 
 -- 植物
-"herba" = nil
+herba = nil
 
 -- 人类
-"humanus" = nil
+humanus = nil
 
 -- 火
-"ignis" = nil
+ignis = nil
 
 -- 下界
-"infernus" = nil
+infernus = nil
 
 -- 工具
-"instrumentum" = nil
+instrumentum = nil
 
 -- 妒忌
-"invidia" = nil
+invidia = nil
 
 -- 暴怒
-"ira" = nil
+ira = nil
 
 -- 旅行
-"iter" = nil
+iter = nil
 
 -- 粘液
-"limus" = nil
+limus = nil
 
 -- 贪婪
-"lucrum" = nil
+lucrum = nil
 
 -- 光明
-"lux" = nil
+lux = nil
 
 -- 欲望
-"luxuria" = nil
+luxuria = nil
 
 -- 机械
-"machina" = nil
+machina = nil
 
 -- 磁性
-"magneto" = nil
+magneto = nil
 
 -- 作物
-"messis" = nil
+messis = nil
 
 -- 金属
-"metallum" = nil
+metallum = nil
 
 -- 收获
-"meto" = nil
+meto = nil
 
 -- 死亡
-"mortuus" = nil
+mortuus = nil
 
 -- 运动
-"motus" = nil
+motus = nil
 
 -- 欺诈
-"nebrisum" = nil
+nebrisum = nil
 
 -- 秩序
-"ordo" = nil
+ordo = nil
 
 -- 布匹
-"pannus" = nil
+pannus = nil
 
 -- 混沌
-"perditio" = nil
+perditio = nil
 
 -- 采掘
-"perfodio" = nil
+perfodio = nil
 
 -- 交换
-"permutatio" = nil
+permutatio = nil
 
 -- 能量
-"potentia" = nil
+potentia = nil
 
 -- 魔法
-"praecantatio" = nil
+praecantatio = nil
 
 -- 起源
-"primordium" = nil
+primordium = nil
 
 -- 辐射
-"radio" = nil
+radio = nil
 
 -- 治愈
-"sano" = nil
+sano = nil
 
 -- 感知
-"sensus" = nil
+sensus = nil
 
 -- 灵魂
-"spiritus" = nil
+spiritus = nil
 
 -- 愚锶
-"strontio" = nil
+strontio = nil
 
 -- 傲慢
-"superbia" = nil
+superbia = nil
 
 -- 靴子
-"tabernus" = nil
+tabernus = nil
 
 -- 武器
-"telum" = nil
+telum = nil
 
 -- 气候
-"tempestas" = nil
+tempestas = nil
 
 -- 时间
-"tempus" = nil
+tempus = nil
 
 -- 黑暗
-"tenebrae" = nil
+tenebrae = nil
 
 -- 终结
-"terminus" = nil
+terminus = nil
 
 -- 地
-"terra" = nil
+terra = nil
 
 -- 装备
-"tutamen" = nil
+tutamen = nil
 
 -- 虚空
-"vacuos" = nil
+vacuos = nil
 
 -- 剧毒
-"venenum" = nil
+venenum = nil
 
 -- 癫狂
-"vesania" = nil
+vesania = nil
 
 -- 生命
-"victus" = nil
+victus = nil
 
 -- 陷阱
-"vinculum" = nil
+vinculum = nil
 
 -- 腐化
-"vitium" = nil
+vitium = nil
 
 -- 水晶
-"vitreus" = nil
+vitreus = nil
 
 -- 飞行
-"volatus" = nil
+volatus = nil
