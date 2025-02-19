@@ -187,10 +187,16 @@ local function requestHandle()
 end
 
 local Info
-local function decodeErrStack()
-	Info = { ["uncraftable"] = {}, ["missing resources"] = {} }
+local function decodeStack()
+	Info = { ["uncraftable"] = {}, ["missing resources"] = {}, requestStack = "", crafting = "" }
 	for i = 1, #errorRequestStack do
 		table.insert(Info[errorRequestStack[i].errInfo], errorRequestStack[i].name)
+	end
+	for i = 1, #requestStack do
+		Info.requestStack = Info.requestStack .. "  • " .. requestStack[i].name
+	end
+	for i = 1, #craftingEssential do
+		Info.crafting = Info.crafting .. "  • " .. craftingEssential[i].name
 	end
 end 
 
@@ -217,7 +223,9 @@ end
 
 local function display()
 	gpu.fill(1, 2, length, height, " ")
-	gpu.set(1 ,5, "--- 以下源质缺少样板 ---")
+	gpu.set(1, 1, "等待合成:" .. Info.requestStack)
+	gpu.set(1, 3, "正在合成:" .. Info.crafting)
+	gpu.set(1, 5, "--- 以下源质缺少样板 ---")
 	draw(1, 6, maxLens, maxRows, Info["uncraftable"])
 	gpu.set(1, 6 + maxRows, "--- 以下源质缺少原料 ---")
 	draw(1, 7 + maxRows, maxLens, maxRows, Info["missing resources"])
@@ -231,7 +239,7 @@ local function main()
 		checkEssentialEnough()
 		sendSignal()
 		requestHandle()
-		decodeErrStack()
+		decodeStack()
 		display()
 		os.sleep(3)
 	end
