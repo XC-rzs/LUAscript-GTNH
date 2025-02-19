@@ -222,7 +222,7 @@ local function draw(x, y, len, row, info)
 end
 
 local function display()
-	gpu.fill(1, 2, length, height, " ")
+	gpu.fill(1, 1, length, height, " ")
 	gpu.set(1, 1, "等待合成:" .. Info.requestStack)
 	gpu.set(1, 3, "正在合成:" .. Info.crafting)
 	gpu.set(1, 5, "--- 以下源质缺少样板 ---")
