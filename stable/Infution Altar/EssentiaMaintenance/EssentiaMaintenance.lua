@@ -1,167 +1,242 @@
-local component = require("component")
-local sides = require("sides")
-local gpu = component.gpu
-local controller = component.me_controller
+local component = require "component"
 
--- 可供配置的部分
-local minReserve = 2048	-- 所有源质的最低储量
-local Num_perRequest = 2048 -- 每次请求的数量
-local signalOutput = sides.top -- 源质不足时红石信号在红石IO端口输出的方向
-local TagName = "InfusionCPU"	-- 设置被用于源质下单的CPU的名称
--- 设置特定源质的缓存量
-local IndividualEssReserve = {
-	...
+local config = {
+	minEssentialStorage = 2048,
+	Num_perRequest = 2048,
+	maxRequestNum = 2,
+	TagName = nil,
+	IndividualEssentialStorage = {
+		...
+	},
+	modemPort = 12306,
+	redstoneOutputSide = require "sides".top
 }
 
-local infoList = {["无样板"]={},["未命名"]={},["无原料"]={},["ableToInfution"]={}}
-local length,height = gpu.getViewport()
-local maxRows = math.floor((height - 6)/2)
-local maxLens = length - 2
-local craftingList = {}
-local infoChange = true
+while next(component.list("me_controller")) == nil do
+	print("未检测到me控制器，请检查") os.sleep(3) os.execute("cls")
+end
+local controller = component.me_controller
 
-local function getEssCraftable()
-	local filter,list = {name = "thaumicenergistics:crafting.aspect"},{}
+local craftables
+local function getCraftables()
+	craftables = {}
+	local filter = {name = "thaumicenergistics:crafting.aspect"}
 	for _, v in pairs(controller.getCraftables(filter)) do
-		list[v.getItemStack().aspect] = v.request
-	end
-	return list
-end
-
-local function changInfo(typeStr,nameStr,status)
-	if infoList[typeStr][nameStr] ~= status then
-		infoChange = true
-		infoList[typeStr][nameStr] = status
+		craftables[v.getItemStack().aspect] = v.request
 	end
 end
 
-local function getUsableCPU()
-	local allCPU,hasNamedCPU = controller.getCpus(),false
-	for n = 1, #allCPU do
-		if allCPU[n].name:match("^"..TagName) == TagName then
-			hasNamedCPU = true
-			changInfo("未命名","cpu",0)
-			if allCPU[n].busy == false then
-				return allCPU[n]
-			end
+local function init()
+	getCraftables()
+	os.execute("cls")
+end
+
+local requestStack = {}
+local requestStackMap = {}
+local craftingEssential = {}
+local errorRequestStack = {}
+
+local function checkCraftCompletion()
+	for i = #craftingEssential, 1, -1 do
+		if craftingEssential[i].isDone() or craftingEssential[i].isCanceled() then
+			requestStackMap[craftingEssential[i].name] = nil
+			table.remove(craftingEssential, i)
 		end
-	end
-	if not hasNamedCPU then
-		changInfo("未命名","cpu",true)
 	end
 end
 
-local function requestEss(name,NUM)
-	ableToInfution = false
-	::RE::
-	for k, v in pairs(craftingList) do
-		if v.isDone() or v.isCanceled() then
-			craftingList[k] = nil
-			goto RE
-		end
-		if k == name then
-			return nil
-		end
-		gpu.set(1,1," • 正在请求源质[ "..tostring(name).." ]      ")
+local function request(name, num)
+	checkCraftCompletion()
+	if not requestStackMap[name] then
+		table.insert(requestStack, { name = name, num = num })
+		requestStackMap[name] = true
 	end
-	if listRequest[name] then
-		changInfo("无样板",name,nil)
-		local cpu = getUsableCPU()
-		if cpu then
-			craftingList[name] = listRequest[name](NUM,nil,cpu.name)
-			if craftingList[name].hasFailed() then
-				changInfo("无原料",name,1)
-				craftingList[name] = nil
-			else
-				changInfo("无原料",name,nil)
-				return nil
-			end
-		end
-	else
-		changInfo("无样板",name,1)
+	if #requestStack == 0 then
+		requestStack = { table.unpack(errorRequestStack) }
+		errorRequestStack = {}
 	end
 end
 
-local function requestMissingEss(allEss)
+local function checkEssentialExist(Essential)
 	local list = {}
-    for _, v in pairs(allEss) do
+    for _, v in pairs(Essential) do
     	list[v.label:match("^%S+"):lower()] = true
     end
-    for k,_ in pairs(listRequest) do
-    	if not list[k] then
-			requestEss(k,1)
-    		return nil
+    for name in pairs(craftables) do
+    	if not list[name] then
+    		local num = config.IndividualEssentialStorage[name]
+    			and config.IndividualEssentialStorage[name].Num_perRequest
+			request(name, num or config.Num_perRequest)
     	end
     end
 end
 
-local function showInfoInBounds(x,y,lens,rows,info)
-	local posX = x
-	for k,_ in pairs(info) do
-		if x + string.len("  • "..k) > lens then
-			x = posX
-			y = y + 1
-			if y > rows then 
-				return nil
-			end
+local function checkEssentialEnough()
+	local currentAllEssential = controller.getEssentiaInNetwork()
+	checkEssentialExist(currentAllEssential)
+	for _, v in pairs(currentAllEssential) do
+		local name = v.label:match("^%S+"):lower()
+		local minStorage = config.IndividualEssentialStorage[name] 
+			and config.IndividualEssentialStorage[name].minStorage 
+			or config.minEssentialStorage
+		local num = config.IndividualEssentialStorage[name]
+			and config.IndividualEssentialStorage[name].Num_perRequest
+		if v.amount < minStorage then
+			request(name, num or config.Num_perRequest)
 		end
-		gpu.set(x,y,"  • "..k)
-		x = x + string.len("  • "..k)
 	end
 end
 
-local function DisplayInformation()
-	if infoChange then
-		gpu.fill(1,2,length,height," ")
-		if infoList["未命名"]["cpu"] == true then
-			gpu.set(1,3," • ERROR: 缺少特殊名称的CPU，无法下单！")
-		end
-		gpu.set(1,5,"---以下源质缺少样板---")
-		showInfoInBounds(1,6,maxLens,maxRows,infoList["无样板"])
-		gpu.set(1,6 + maxRows,"---以下源质缺少原料---")
-		showInfoInBounds(1,7 + maxRows,maxLens,maxRows,infoList["无原料"])
-		gpu.set(length - 12,height - 3,"源质是否充足")
-		gpu.set(length - 8,height - 1,tostring(ableToInfution))
+local function signalHandle(boolean)
+	if next(component.list("modem")) then
+		component.modem.setStrength(400)
+		component.modem.broadcast(config.modemPort, boolean)
 	end
-	infoChange= false
+	if next(component.list("redstone")) then
+		if boolean then
+			component.redstone.setOutput(config.redstoneOutputSide, 15)
+		else
+			component.redstone.setOutput(config.redstoneOutputSide, 0)
+		end
+	end
 end
 
-local function hasRSIO()
-	for _,_ in pairs(component.list("redstone")) do
+local isEssentialEnough = false
+local function sendSignal()
+	if next(requestStackMap) == nil and isEssentialEnough == false then
+		isEssentialEnough = true
+		signalHandle(isEssentialEnough)
+	elseif isEssentialEnough == true then
+		isEssentialEnough = false
+		signalHandle(isEssentialEnough)
+	end
+end
+
+local function checkCraftables()
+	for i = #requestStack, 1, -1 do
+		if not craftables[requestStack[i].name] then
+			table.insert(errorRequestStack, table.remove(requestStack, i))
+			errorRequestStack[#errorRequestStack].errInfo = "uncraftable"
+		end
+	end
+end
+
+local Cpus
+local idleCpus = {}
+local function hasCpus()
+	if #Cpus ~= 0 then
 		return true
+	else
+		print("未检测到可用CPU")
+		os.sleep(3) os.execute('cls')
+		return false
+	end
+end
+
+local function getCpusWithTagName()
+	Cpus = {}
+	local cpus = controller.getCpus()
+	for i = 1, #cpus do
+		if not config.TagName or cpus[i].name == config.TagName then
+			table.insert(Cpus, 
+				{ isBusy = cpus[i].cpu.isBusy, name = cpus[i].name })
+		end
+	end
+end
+
+local function checkCpuIdle()
+	if #idleCpus == 0 then
+		repeat
+			getCpusWithTagName()
+		until hasCpus()
+		idleCpus = Cpus
+	end
+	for i =  #idleCpus, 1, -1 do
+		if idleCpus[i].isBusy() then
+			table.remove(idleCpus, i)
+		end
+	end
+end
+
+local function whenRequestHandleFailed(info)
+	if info == "request failed (missing resources?)" then
+		table.insert(errorRequestStack, table.remove(requestStack, 1))
+		errorRequestStack[#errorRequestStack].errInfo = "missing resources"
+	else
+		table.insert(requestStack, table.remove(requestStack, 1))
+	end
+end
+
+local function whenRequestHandleSucceeded(result)
+	table.remove(idleCpus, 1)
+	table.insert(craftingEssential, table.remove(requestStack[1]))
+	local this = craftingEssential[#craftingEssential]
+	this.isDone, this.isCanceled = result.isDone, result.isCanceled
+end
+
+local function requestHandle()
+	checkCraftables()
+	checkCpuIdle()
+	while #requestStack > 0 and #idleCpus ~= 0 
+		and #craftingEssential < config.maxRequestNum do
+		local result = craftables[requestStack[1].name](requestStack[1].num, false, idleCpus[1].name)
+		local hasFailed, info = result.hasFailed
+		if hasFailed then
+			whenRequestHandleFailed(info)
+		else
+			whenRequestHandleSucceeded(result)
+		end
+	end
+end
+
+local Info
+local isInfoChanged
+local function decodeErrStack()
+	Info = { ["uncraftable"] = {}, ["missing resources"] = {} }
+	for i = 1, #errorRequestStack do
+		table.insert(Info[errorRequestStack[i].errInfo], errorRequestStack[i].name)
 	end
 end 
 
-local function main()
-	listRequest = getEssCraftable()
-	os.execute("cls")
-	while true do
-		os.sleep(1)
-		repeat
-			ableToInfution = true
-			local currentEss = controller.getEssentiaInNetwork()
-			requestMissingEss(currentEss)
-			for _, v in pairs(currentEss) do
-				local name = v.label:match("^%S+"):lower()
-				local finalMinReserve = IndividualEssReserve[name]
-				if not finalMinReserve then
-					finalMinReserve = minReserve
-				end
-				if v.amount < finalMinReserve then
-					requestEss(name,Num_perRequest)
-				end
+local gpu = component.gpu
+local length, height = gpu.getViewport()
+local maxRows = math.floor( ( height - 6 ) / 2 )
+local maxLens = length - 2
+
+local function draw(x, y, len, row, info)
+	local posX = x
+	for k in pairs(info) do
+		if x + string.len("  • " .. k) > len then
+			x = posX
+			y = y + 1
+			if y > row then 
+				return nil
 			end
-			changInfo("ableToInfution","content",ableToInfution)
-			if hasRSIO() then
-				if ableToInfution then
-					component.redstone.setOutput(signalOutput,16)
-				else
-					component.redstone.setOutput(signalOutput,0)
-				end
-			end
-			DisplayInformation()
-		until ableToInfution == true
+		end
+		gpu.set(x, y, "  • " .. k)
+		x = x + string.len("  • " .. k)
 	end
 end
 
+local function display()
+	gpu.fill(1, 2, length, height, " ")
+	gpu.set(1 ,5, "---以下源质缺少样板---")
+	draw(1, 6, maxLens, maxRows, Info["uncraftable"])
+	gpu.set(1, 6 + maxRows, "---以下源质缺少原料---")
+	draw(1, 7 + maxRows, maxLens, maxRows, Info["missing resources"])
+	gpu.set(length - 12, height - 3, "源质是否充足")
+	gpu.set(length - 8, height - 1, tostring(isEssentialEnough))
+end
+
+local function main()
+	init()
+	while true do
+		checkEssentialEnough()
+		sendSignal()
+		requestHandle()
+		decodeErrStack()
+		display()
+		os.sleep(5)
+	end
+end
 main()

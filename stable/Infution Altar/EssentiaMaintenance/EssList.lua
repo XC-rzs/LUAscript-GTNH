@@ -1,206 +1,413 @@
 -- 平衡
-aequalitas = nil
+aequalitas = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 风
-aer = nil
+aer = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 异域
-alienis = nil
+alienis = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 水
-aqua = nil
+aqua = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 木头
-arbor = nil
+arbor = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 星辰
-astrum = nil
+astrum = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 灵气
-auram = nil
+auram = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 野兽
-bestia = nil
+bestia = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 宙空
-caelum = nil
+caelum = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 思维
-cognitio = nil
+cognitio = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 肉体
-corpus = nil
+corpus = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 怠倦
-desidia = nil
+desidia = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 电力
-electrum = nil
+electrum = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 亡灵
-exanimis = nil
+exanimis = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 合成
-fabrico = nil
+fabrico = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 饥饿
-fames = nil
+fames = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 寒冰
-gelum = nil
+gelum = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 荣耀
-gloria = nil
+gloria = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 饕餮
-gula = nil
+gula = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 植物
-herba = nil
+herba = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 人类
-humanus = nil
+humanus = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 火
-ignis = nil
+ignis = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 下界
-infernus = nil
+infernus = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 工具
-instrumentum = nil
+instrumentum = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 妒忌
-invidia = nil
+invidia = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 暴怒
-ira = nil
+ira = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 旅行
-iter = nil
+iter = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 粘液
-limus = nil
+limus = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 贪婪
-lucrum = nil
+lucrum = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 光明
-lux = nil
+lux = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 欲望
-luxuria = nil
+luxuria = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 机械
-machina = nil
+machina = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 磁性
-magneto = nil
+magneto = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 作物
-messis = nil
+messis = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 金属
-metallum = nil
+metallum = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 收获
-meto = nil
+meto = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 死亡
-mortuus = nil
+mortuus = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 运动
-motus = nil
+motus = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 欺诈
-nebrisum = nil
+nebrisum = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 秩序
-ordo = nil
+ordo = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 布匹
-pannus = nil
+pannus = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 混沌
-perditio = nil
+perditio = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 采掘
-perfodio = nil
+perfodio = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 交换
-permutatio = nil
+permutatio = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 能量
-potentia = nil
+potentia = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 魔法
-praecantatio = nil
+praecantatio = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 起源
-primordium = nil
+primordium = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 辐射
-radio = nil
+radio = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 治愈
-sano = nil
+sano = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 感知
-sensus = nil
+sensus = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 灵魂
-spiritus = nil
+spiritus = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 愚锶
-strontio = nil
+strontio = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 傲慢
-superbia = nil
+superbia = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 靴子
-tabernus = nil
+tabernus = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 武器
-telum = nil
+telum = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 气候
-tempestas = nil
+tempestas = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 时间
-tempus = nil
+tempus = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 黑暗
-tenebrae = nil
+tenebrae = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 终结
-terminus = nil
+terminus = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 地
-terra = nil
+terra = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 装备
-tutamen = nil
+tutamen = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 虚空
-vacuos = nil
+vacuos = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 剧毒
-venenum = nil
+venenum = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 癫狂
-vesania = nil
+vesania = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 生命
-victus = nil
+victus = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 陷阱
-vinculum = nil
+vinculum = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 腐化
-vitium = nil
+vitium = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 水晶
-vitreus = nil
+vitreus = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
 
 -- 飞行
-volatus = nil
+volatus = {
+	minStorage = nil,
+	Num_perRequest = nil
+}
