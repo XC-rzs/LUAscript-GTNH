@@ -36,25 +36,13 @@ local requestStackMap = {}
 local craftingEssential = {}
 local errorRequestStack = {}
 
-local function checkCraftCompletion()
-	for i = #craftingEssential, 1, -1 do
-		if craftingEssential[i].isDone() or craftingEssential[i].isCanceled() then
-			requestStackMap[craftingEssential[i].name] = nil
-			table.remove(craftingEssential, i)
-		end
-	end
-end
-
+local isEssentialEnough
 local function request(name, num)
-	checkCraftCompletion()
 	if not requestStackMap[name] then
 		table.insert(requestStack, { name = name, num = num })
 		requestStackMap[name] = true
 	end
-	if #requestStack == 0 then
-		requestStack = { table.unpack(errorRequestStack) }
-		errorRequestStack = {}
-	end
+	isEssentialEnough = false
 end
 
 local function checkEssentialExist(Essential)
@@ -69,56 +57,6 @@ local function checkEssentialExist(Essential)
 			request(name, num or config.Num_perRequest)
     	end
     end
-end
-
-local function checkEssentialEnough()
-	local currentAllEssential = controller.getEssentiaInNetwork()
-	checkEssentialExist(currentAllEssential)
-	for _, v in pairs(currentAllEssential) do
-		local name = v.label:match("^%S+"):lower()
-		local minStorage = config.IndividualEssentialStorage[name] 
-			and config.IndividualEssentialStorage[name].minStorage 
-			or config.minEssentialStorage
-		local num = config.IndividualEssentialStorage[name]
-			and config.IndividualEssentialStorage[name].Num_perRequest
-		if v.amount < minStorage then
-			request(name, num or config.Num_perRequest)
-		end
-	end
-end
-
-local function signalHandle(boolean)
-	if next(component.list("modem")) then
-		component.modem.setStrength(400)
-		component.modem.broadcast(config.modemPort, boolean)
-	end
-	if next(component.list("redstone")) then
-		if boolean then
-			component.redstone.setOutput(config.redstoneOutputSide, 15)
-		else
-			component.redstone.setOutput(config.redstoneOutputSide, 0)
-		end
-	end
-end
-
-local isEssentialEnough = false
-local function sendSignal()
-	if next(requestStackMap) == nil and isEssentialEnough == false then
-		isEssentialEnough = true
-		signalHandle(isEssentialEnough)
-	elseif isEssentialEnough == true then
-		isEssentialEnough = false
-		signalHandle(isEssentialEnough)
-	end
-end
-
-local function checkCraftables()
-	for i = #requestStack, 1, -1 do
-		if not craftables[requestStack[i].name] then
-			table.insert(errorRequestStack, table.remove(requestStack, i))
-			errorRequestStack[#errorRequestStack].errInfo = "uncraftable"
-		end
-	end
 end
 
 local Cpus
@@ -158,31 +96,90 @@ local function checkCpuIdle()
 	end
 end
 
-local function whenRequestHandleFailed(info)
-	if info == "request failed (missing resources?)" then
-		table.insert(errorRequestStack, table.remove(requestStack, 1))
-		errorRequestStack[#errorRequestStack].errInfo = "missing resources"
-	else
-		table.insert(requestStack, table.remove(requestStack, 1))
+local function checkEssentialEnough()
+	isEssentialEnough = true
+	local currentAllEssential = controller.getEssentiaInNetwork()
+	checkEssentialExist(currentAllEssential)
+	for _, v in pairs(currentAllEssential) do
+		local name = v.label:match("^%S+"):lower()
+		local minStorage = config.IndividualEssentialStorage[name] 
+			and config.IndividualEssentialStorage[name].minStorage 
+			or config.minEssentialStorage
+		if v.amount < minStorage then
+			local num = config.IndividualEssentialStorage[name]
+			and config.IndividualEssentialStorage[name].Num_perRequest
+			request(name, num or config.Num_perRequest)
+		end
+	end
+	-- handle errorStack
+	if #requestStack == 0 then
+		checkCpuIdle()
+		local unpackNum = math.min(#idleCpus, 
+			config.maxRequestNum, #errorRequestStack)
+		for i = 1, unpackNum do
+			table.insert(requestStack, table.remove(errorRequestStack, 1))
+		end
+	end
+end
+
+local function sendSignal()
+	if next(component.list("modem")) then
+		component.modem.setStrength(400)
+		component.modem.broadcast(config.modemPort, isEssentialEnough)
+	end
+	if next(component.list("redstone")) then
+		if isEssentialEnough then
+			component.redstone.setOutput(config.redstoneOutputSide, 15)
+		else
+			component.redstone.setOutput(config.redstoneOutputSide, 0)
+		end
+	end
+end
+
+local function checkCraftCompletion()
+	for i = #craftingEssential, 1, -1 do
+		if craftingEssential[i].isDone() or craftingEssential[i].isCanceled() then
+			requestStackMap[craftingEssential[i].name] = nil
+			table.remove(craftingEssential, i)
+		end
+	end
+end
+
+local function checkCraftables()
+	for i = #requestStack, 1, -1 do
+		if not craftables[requestStack[i].name] then
+			table.insert(errorRequestStack, table.remove(requestStack, i))
+			errorRequestStack[#errorRequestStack].errInfo = "uncraftable"
+		end
 	end
 end
 
 local function whenRequestHandleSucceeded(result)
 	table.remove(idleCpus, 1)
-	table.insert(craftingEssential, table.remove(requestStack[1]))
+	table.insert(craftingEssential, table.remove(requestStack, 1))
 	local this = craftingEssential[#craftingEssential]
 	this.isDone, this.isCanceled = result.isDone, result.isCanceled
 end
 
+local function whenRequestHandleFailed(result, info)
+	if info == "no link" then
+		whenRequestHandleSucceeded(result)
+	else
+		table.insert(errorRequestStack, table.remove(requestStack, 1))
+		errorRequestStack[#errorRequestStack].errInfo = "missing resources"
+	end
+end
+
 local function requestHandle()
+	checkCraftCompletion()
 	checkCraftables()
 	checkCpuIdle()
 	while #requestStack > 0 and #idleCpus ~= 0 
 		and #craftingEssential < config.maxRequestNum do
-		local result = craftables[requestStack[1].name](requestStack[1].num, false, idleCpus[1].name)
-		local hasFailed, info = result.hasFailed
+		local result = craftables[requestStack[1].name](requestStack[1].num, true, idleCpus[1].name)
+		local hasFailed, info = result.hasFailed()
 		if hasFailed then
-			whenRequestHandleFailed(info)
+			whenRequestHandleFailed(result, info)
 		else
 			whenRequestHandleSucceeded(result)
 		end
@@ -190,7 +187,6 @@ local function requestHandle()
 end
 
 local Info
-local isInfoChanged
 local function decodeErrStack()
 	Info = { ["uncraftable"] = {}, ["missing resources"] = {} }
 	for i = 1, #errorRequestStack do
@@ -204,25 +200,26 @@ local maxRows = math.floor( ( height - 6 ) / 2 )
 local maxLens = length - 2
 
 local function draw(x, y, len, row, info)
-	local posX = x
-	for k in pairs(info) do
-		if x + string.len("  • " .. k) > len then
-			x = posX
-			y = y + 1
-			if y > row then 
+	local currX = x
+	local currRow = 0
+	for i = 1, #info do
+		if currX + string.len("  • " .. info[i]) > len then
+			currX = x
+			currRow = currRow + 1
+			if currRow > row then 
 				return nil
 			end
 		end
-		gpu.set(x, y, "  • " .. k)
-		x = x + string.len("  • " .. k)
+		gpu.set(currX, y + currRow, "  • " .. info[i])
+		currX = currX + string.len("  • " .. info[i])
 	end
 end
 
 local function display()
 	gpu.fill(1, 2, length, height, " ")
-	gpu.set(1 ,5, "---以下源质缺少样板---")
+	gpu.set(1 ,5, "--- 以下源质缺少样板 ---")
 	draw(1, 6, maxLens, maxRows, Info["uncraftable"])
-	gpu.set(1, 6 + maxRows, "---以下源质缺少原料---")
+	gpu.set(1, 6 + maxRows, "--- 以下源质缺少原料 ---")
 	draw(1, 7 + maxRows, maxLens, maxRows, Info["missing resources"])
 	gpu.set(length - 12, height - 3, "源质是否充足")
 	gpu.set(length - 8, height - 1, tostring(isEssentialEnough))
@@ -236,7 +233,7 @@ local function main()
 		requestHandle()
 		decodeErrStack()
 		display()
-		os.sleep(5)
+		os.sleep(3)
 	end
 end
 main()

@@ -57,7 +57,7 @@ local function registerEventListen()
 	end)
 	if next(component.list("modem")) ~= nil then
 		component.modem.open(config.modemPort)
-		event.listen("modem_massage", function(eventType, selfAddress, sourceAddress, port, distance, massage)
+		event.listen("modem_message", function(eventType, selfAddress, sourceAddress, port, distance, massage)
 			enableSignal.fromModem = massage
 		end)
 	end
@@ -172,6 +172,7 @@ local function checkWandsAspects()
 end
 
 local function checkPreconditionsForInfusion()
+	event.pull(0.01)
 	if enableSignal.fromRedstone == false then
 		table.insert(ErrList, "注魔被外部红石信号暂停")
 	end
