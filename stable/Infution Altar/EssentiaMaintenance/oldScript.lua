@@ -1,5 +1,4 @@
 local component = require("component")
-local sides = require("sides")
 local gpu = component.gpu
 local controller = component.me_controller
 
