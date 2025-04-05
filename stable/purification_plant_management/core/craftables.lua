@@ -155,7 +155,7 @@ local function waitForCycleToEnd(machine, second)
     screen.setMachineParallel(machine.name:match("t(.)"), "last", parallel)
 
     -- If the set parallel is less than the actual parallel, it will be automatically corrected (but not saved)
-    if parallel > config[machine.name].paralle then
+    if parallel > tostring(config[machine.name].parallel) then
         config[machine.name].paralle = parallel
     end
 

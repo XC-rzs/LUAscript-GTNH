@@ -17,6 +17,7 @@ function meNetwork.getFilteredItems(filters)
     end
 
     local items
+    local size
     local object = {}
     for _, filter in ipairs(filters) do
         items = interface.getItemsInNetwork(filter)
@@ -24,6 +25,10 @@ function meNetwork.getFilteredItems(filters)
         if next(items) == nil then
             object[presetData.nameToLabel(filter.name, filter.dagamge)] = 0
         else
+
+            --Prevent data overflow
+            if items[1].size < 0 then size = 9223372036854775808
+            else size = items[1].size end
             object[presetData.nameToLabel(items[1].name, items[1].damage)] = items[1].size
         end
     end
@@ -46,8 +51,13 @@ function meNetwork.getFilteredFlquids(filters)
     
     -- translate raw to mapping from flquids name to their amount  
     local map = {}
+    local amount
     for _, flquid in ipairs(raw) do
-        map[flquid.name] = flquid.amount
+
+        --Prevent data overflow
+        if flquid.amount < 0 then amount = 9223372036854775808
+        else amount = flquid.amount end
+        map[flquid.name] = amount
     end
 
 
