@@ -86,7 +86,7 @@ local function getInterfaceAndChestDirction()
 end
 
 local function getTransposerProxy()
-	for _, proxy in pairs(getComponentProxy("transposer")) do
+	for _, proxy in ipairs(getComponentProxy("transposer")) do
 		for i = 0, 5 do
 			if proxy.getInventoryName(i) == "tile.blockStoneDevice" then
 				componentProxy.transposer.forArcanePedestal = proxy
