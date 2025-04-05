@@ -49,5 +49,5 @@ return {
     EnableGrade1Material_Water_Check = false,
     EnableIsolationMode = false,
     sideRedstoneSignalOutput = sides.top,
-    secondClockCycle = 1
+    secondClockCycle = 10
 }
