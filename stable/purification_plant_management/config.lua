@@ -1,3 +1,5 @@
+local sides = require "sides"
+
 local KL = 1000
 local ML = 1000*KL
 local GL = 1000*ML
@@ -45,5 +47,7 @@ return {
     },
     EnableMaterialsAmountCheck = true,
     EnableGrade1Material_Water_Check = false,
+    EnableIsolationMode = false,
+    sideRedstoneSignalOutput = sides.top,
     secondClockCycle = 1
 }

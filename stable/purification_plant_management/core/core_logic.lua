@@ -1,11 +1,9 @@
 local component = require "component"
 local event = require "event"
-local require = require"purified".require
-
-local machines = require "core.base.machines"
-local craftables = require "core.craftables"
-local screen = require "core.screen"
-local config = require "config"
+local machines = require"purified".require "core.base.machines"
+local craftables = require"purified".require "core.craftables"
+local screen = require"purified".require "core.screen"
+local config = require"purified".require "config"
 
 local function init()
     if machines.getProxy() then
@@ -28,6 +26,10 @@ local function main()
         local success, err = pcall(craftables.execute)
         if not success then
            screen.addError(err)
+        end
+
+        if config.EnableIsolationMode and not craftables.isMissingPurifiedWater then
+            require "component".redstone.setOutput(config.sideRedstoneSignalOutput, 0)
         end
 
         screen.display()

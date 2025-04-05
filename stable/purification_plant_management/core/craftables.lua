@@ -1,16 +1,15 @@
-local require = require"purified".require
-
-local presetData = require "core.base.preset_data"
-local meNetwork = require "core.base.me_network"
-local machines = require "core.base.machines"
-local screen = require "core.screen"
-local bigInt = require "lib.bigint"
-local config = require "config"
+local presetData = require"purified".require "core.base.preset_data"
+local meNetwork = require"purified".require "core.base.me_network"
+local machines = require"purified".require "core.base.machines"
+local screen = require"purified".require "core.screen"
+local bigInt = require"purified".require "lib.bigint"
+local config = require"purified".require "config"
 
 local craftables = {}
 
 craftables.skipSleep = false
 craftables.hasCrafted = false
+craftables.isMissingPurifiedWater = false
 craftables.currentMaterialsLabelToNum = {}
 
 ---@param func function : the first param and the second param must be name and machine
@@ -229,6 +228,13 @@ function craftables.execute()
     local recipeNameList = getUnderTargetPurifiedWaterRecipe()
     local currentMachine
     for i = 1, #recipeNameList do
+
+        -- If the content inside the loop is executed, it indicates a lack of purified water
+        if config.EnableIsolationMode then
+            craftables.isMissingPurifiedWater = true
+            require "component".redstone.setOutput(config.sideRedstoneSignalOutput, 15)
+        end
+
         currentMachine = machines.machines[table.remove(recipeNameList)]
         tryToExecuteTheRecipe(currentMachine, recipeNameList)
 
