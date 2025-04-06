@@ -121,7 +121,7 @@ local function areOtherMaterialsEnough(machine)
     return result
 end
 
-local function isMaterialsEnough(machine, recipeNameList)
+local function areMaterialsEnough(machine, recipeNameList)
     local result = true
     local recipe = machine.recipe
     local label = presetData.nameToLabel(recipe.water.filter.name)
@@ -130,9 +130,7 @@ local function isMaterialsEnough(machine, recipeNameList)
     }
 
     if not config.EnableGrade1Material_Water_Check and recipe.water.filter.name == "water" then
-        targetLabelToNum = {
-            ["水"] = -1
-        }
+        targetLabelToNum = { ["水"] = -1 }
     end
 
     local arrar = getUnderTargetMaterials(craftables.currentMaterialsLabelToNum, targetLabelToNum)
@@ -215,12 +213,16 @@ local function tryToExecuteTheRecipe(machine, recipeNameList)
     end
 
 
-    if isMaterialsEnough(machine, recipeNameList) then
+    if areMaterialsEnough(machine, recipeNameList) then
         screen.setMachineStatus(machine.name:match("t(.)") + 0, 3)
         screen.display()
         startWork(machine)
     end
     screen.setMachineStatus(machine.name:match("t(.)") + 0, 2)
+end
+
+local function setRedstoneOutput(signalStrength)
+    require "component".redstone.setOutput(config.sideRedstoneSignalOutput, signalStrength)
 end
 
 -- interface
@@ -237,7 +239,7 @@ function craftables.execute()
         -- If the content inside the loop is executed, it indicates a lack of purified water
         if config.EnableIsolationMode then
             craftables.isMissingPurifiedWater = true
-            require "component".redstone.setOutput(config.sideRedstoneSignalOutput, 15)
+            setRedstoneOutput(15)
         end
 
         currentMachine = machines.machines[table.remove(recipeNameList)]
@@ -249,6 +251,10 @@ function craftables.execute()
             craftables.hasCrafted = false
             break
         end
+    end
+
+    if config.EnableIsolationMode and not craftables.isMissingPurifiedWater then
+        setRedstoneOutput(0)
     end
 end
 

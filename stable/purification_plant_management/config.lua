@@ -5,8 +5,8 @@ local ML = 1000*KL
 local GL = 1000*ML
 
 return {
+    -- 两个必须都有值才起作用
     inputEnergy = {
-        energy = nil,
         voltage = nil,
         ampere = nil,
     },
@@ -42,7 +42,7 @@ return {
         superconductorTier = "uv"
     },
     t8 = {
-        minBufferStock = 0,
+        minBufferStock = 1*KL,
         parallel = 1,
     },
     EnableMaterialsAmountCheck = true,

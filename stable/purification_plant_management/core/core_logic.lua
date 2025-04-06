@@ -1,9 +1,24 @@
 local component = require "component"
 local event = require "event"
-local machines = require"purified".require "core.base.machines"
-local craftables = require"purified".require "core.craftables"
-local screen = require"purified".require "core.screen"
-local config = require"purified".require "config"
+local presetData = require "purified".require "core.base.preset_data"
+local machines = require "purified".require "core.base.machines"
+local craftables = require "purified".require "core.craftables"
+local screen = require "purified".require "core.screen"
+local config = require "purified".require "config"
+
+-- check the type of inputEnergy
+local typeV = type(config.inputEnergy.voltage)
+local typeA = type(config.inputEnergy.ampere)
+if typeV == "nil" or typeA == "nil" then
+    config.inputEnergy.voltage = nil
+    config.inputEnergy.ampere = nil
+elseif typeV == "number" and typeA == "number" then
+    config.inputEnergy.energy = config.inputEnergy.voltage * config.inputEnergy.ampere
+else
+    screen.addError(presetData.errorList[6])
+    config.inputEnergy.voltage = nil
+    config.inputEnergy.ampere = nil
+end
 
 local function init()
     if machines.getProxy() then
@@ -26,10 +41,6 @@ local function main()
         local success, err = pcall(craftables.execute)
         if not success then
            screen.addError(err)
-        end
-
-        if config.EnableIsolationMode and not craftables.isMissingPurifiedWater then
-            require "component".redstone.setOutput(config.sideRedstoneSignalOutput, 0)
         end
 
         screen.display()

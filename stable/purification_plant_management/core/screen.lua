@@ -97,6 +97,7 @@ function page2:display()
     self.errorList = {}
     gpu.bitblt(screenIndex, 1, 1, 160, 50, bufferIndex, 1, 1)
     io.read()
+    os.execute('cls')
 end
 
 -- interface
@@ -105,10 +106,13 @@ end
 function screen.addError(massage)
     checkArg(1, massage, "string")
 
+    local matchMassage = massage:match("^.*:.*: (.*)$")
     if massage == "no such component" then
         massage = presetData.errorList[3]
-    elseif massage:match("^.*:.*: (.*)$") == "attempt to index a boolean value (field 'proxy')" then
+    elseif matchMassage == "attempt to index a boolean value (field 'proxy')" then
         massage = presetData.errorList[4]
+    elseif matchMassage == "no primary 'redstone' available" then
+        massage = presetData.errorList[5]
     end
     table.insert(page2.errorList, massage)
 end

@@ -158,8 +158,10 @@ recipe.t8 = {
 local errorList = {}
 errorList[1] = "机器超时运行"
 errorList[2] = "机器可能因缺少能量关机 或 无法识别到配方 或 需要与主机重新绑定"
-errorList[3] = "组件代理丢失，请检查适配器与水厂机器主方块(或me接口)是否保持连接状态"
+errorList[3] = "组件代理丢失，请检查 <水厂机器主方块|me接口> 是否接入oc"
 errorList[4] = "未找到水厂主机主方块，请用适配器连接水厂主机主方块"
+errorList[5] = "未找到红石IO端口，请将一个红石IO端口接入oc"
+errorList[6] = "配置文件中输入电压与电流类型错误，设置将不生效"
 
 local voltage = {}
 voltage["ev"] = 2048

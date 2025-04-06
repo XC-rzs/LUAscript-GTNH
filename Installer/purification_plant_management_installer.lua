@@ -7,14 +7,14 @@ local rootUrl = "https://gitee.com/CrzS/LUAscript-GTNH/raw/new_script/stable/pur
 local downloadList = {
     {"/start.lua", 51104},
     {"/purified_package.lua", 49097},
-    {"/config.lua", 48561},
+    {"/config.lua", 28242},
     {"/lib/bigint.lua", 58814},
-    {"/core/screen.lua", 29763},
-    {"/core/craftables.lua", 43655},
-    {"/core/core_logic.lua", 31008},
+    {"/core/screen.lua", 35319},
+    {"/core/craftables.lua", 33742},
+    {"/core/core_logic.lua", 42344},
     {"/core/base/machines.lua", 9835},
     {"/core/base/me_network.lua", 57867},
-    {"/core/base/preset_data.lua", 47703},
+    {"/core/base/preset_data.lua", 20581},
 }
 
 local crc16_table = {}
