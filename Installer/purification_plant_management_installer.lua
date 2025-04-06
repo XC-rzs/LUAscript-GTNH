@@ -7,7 +7,7 @@ local rootUrl = "https://gitee.com/CrzS/LUAscript-GTNH/raw/new_script/stable/pur
 local downloadList = {
     {"/start.lua", 51104},
     {"/purified_package.lua", 49097},
-    {"/config.lua", 58431},
+    {"/config.lua", 55615},
     {"/lib/bigint.lua", 58814},
     {"/core/screen.lua", 35319},
     {"/core/craftables.lua", 33742},
@@ -62,7 +62,6 @@ for _, array in ipairs(downloadList) do
 
     for i = 1, 3 do
         shell.execute("wget -f " .. url .. " -O " .. path)
-        print(crc16_file(path))
         if fs.exists(path) and crc == crc16_file(path) then
             break
         end
