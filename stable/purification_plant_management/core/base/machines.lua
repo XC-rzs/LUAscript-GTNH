@@ -47,6 +47,7 @@ function machines.getProxy()
 
         name = presetData.nameToMachine[name]
         if name ~= nil and machines.machines[name].proxy ~= nil then
+            proxy.setWorkAllowed(false)
             machines.machines[name].proxy = proxy
         end
     end
@@ -101,7 +102,7 @@ function machines.getEnergy()
         ampere = getAmpere(ampere)
         voltage = getVoltage(machineName:match("tier.(%d+)"))
     elseif type(machineName:match("multi(%d+)")) == "string" then
-        ampere = getAmpere(machineName:match("multi(%d+)"))
+        ampere = bigInt.new(machineName:match("multi(%d+)"))
         voltage = getVoltage(machineName:match("tier.(%d+)"))
     elseif type(machineName:match("hatch_(%d+)")) == "string" then
         ampere = bigInt.new(machineName:match("hatch_(%d+)"))
