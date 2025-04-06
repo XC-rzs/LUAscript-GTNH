@@ -5,7 +5,7 @@ local ML = 1000*KL
 local GL = 1000*ML
 
 return {
-    -- 两个必须都有值才起作用
+    -- 两个必须都有值该项才起作用
     inputEnergy = {
         voltage = nil,
         ampere = nil,
