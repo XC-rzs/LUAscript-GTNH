@@ -10,7 +10,7 @@ local downloadList = {
     {"/config.lua", 55615},
     {"/lib/bigint.lua", 58814},
     {"/core/screen.lua", 35319},
-    {"/core/craftables.lua", 15799},
+    {"/core/craftables.lua", 43072},
     {"/core/core_logic.lua", 62085},
     {"/core/base/machines.lua", 9835},
     {"/core/base/me_network.lua", 57867},
