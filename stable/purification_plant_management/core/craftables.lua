@@ -255,6 +255,8 @@ function craftables.execute()
 
     if config.EnableIsolationMode and not craftables.isMissingPurifiedWater then
         setRedstoneOutput(0)
+    else
+        craftables.isMissingPurifiedWater = false
     end
 end
 
