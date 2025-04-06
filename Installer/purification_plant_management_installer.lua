@@ -13,8 +13,8 @@ local downloadList = {
     {"/core/craftables.lua", 43655},
     {"/core/core_logic.lua", 31008},
     {"/core/base/machines.lua", 9835},
-    {"/core/base/me_network.lua", 52978},
-    {"/core/base/preset_data.lua", 44286},
+    {"/core/base/me_network.lua", 57867},
+    {"/core/base/preset_data.lua", 47703},
 }
 
 local crc16_table = {}

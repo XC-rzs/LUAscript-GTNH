@@ -158,7 +158,7 @@ recipe.t8 = {
 local errorList = {}
 errorList[1] = "机器超时运行"
 errorList[2] = "机器可能因缺少能量关机 或 无法识别到配方 或 需要与主机重新绑定"
-errorList[3] = "机器代理丢失，请检查适配器与水厂机器主方块是否保持连接状态"
+errorList[3] = "组件代理丢失，请检查适配器与水厂机器主方块(或me接口)是否保持连接状态"
 errorList[4] = "未找到水厂主机主方块，请用适配器连接水厂主机主方块"
 
 local voltage = {}

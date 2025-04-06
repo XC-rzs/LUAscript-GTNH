@@ -2,7 +2,7 @@ local component = require "component"
 local presetData = require "purified".require "core.base.preset_data"
 
 while next(component.list("me_interface")) == nil do
-    print("未检测到me接口，请检测")
+    print("未检测到me接口，请检查")
     os.sleep(3)
 end
 local interface = component.me_interface
