@@ -149,7 +149,7 @@ recipe.t8 = {
         { filter = materials["粲夸克释放催化剂"], num = 4 },
         { filter = materials["顶夸克释放催化剂"], num = 4 },
         { filter = materials["底夸克释放催化剂"], num = 4 },
-        { filter = materials["熔融无尽"], num = 2592 }
+        { filter = materials["熔融无尽"], num = 6048 }
     },
     output = { filter = materials["8级净化水单元"], num = 900 },
     power = 7864320
