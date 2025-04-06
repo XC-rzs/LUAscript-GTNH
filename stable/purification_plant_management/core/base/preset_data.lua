@@ -106,7 +106,7 @@ recipe.t4 = {
     water = { filter = materials["絮凝水"], num = KL},
     others = {
         { filter = materials["氢氧化钠粉"], num = 245 * MARGIN },
-        { fiiter = materials["氢氯酸"], num = 2450 * MARGIN }
+        { filter = materials["氢氯酸"], num = 2450 * MARGIN }
     },
     output = { filter = materials["pH中和水"], num = 900 },
     power = 122880
