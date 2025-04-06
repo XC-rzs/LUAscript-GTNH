@@ -12,7 +12,7 @@ local downloadList = {
     {"/core/screen.lua", 35319},
     {"/core/craftables.lua", 43072},
     {"/core/core_logic.lua", 62085},
-    {"/core/base/machines.lua", 9835},
+    {"/core/base/machines.lua", 63791},
     {"/core/base/me_network.lua", 57867},
     {"/core/base/preset_data.lua", 5345},
 }
