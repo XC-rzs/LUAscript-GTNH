@@ -14,7 +14,7 @@ local downloadList = {
     {"/core/core_logic.lua", 62085},
     {"/core/base/machines.lua", 9835},
     {"/core/base/me_network.lua", 57867},
-    {"/core/base/preset_data.lua", 20581},
+    {"/core/base/preset_data.lua", 5345},
 }
 
 local crc16_table = {}
